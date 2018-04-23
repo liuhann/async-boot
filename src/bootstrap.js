@@ -1,6 +1,8 @@
-import HttpClient from './utils/http-client';
-import contextProto from  './utils/context';
-import {isFunction, isPlainObject} from './utils/lang';
+import HttpClient from './utils/http-client'
+import contextProto from  './utils/context'
+import {isFunction, isPlainObject} from './utils/lang'
+
+import compose from 'koa-compose'
 
 /**
  * Boot Strap class
@@ -18,12 +20,12 @@ class BootStrap {
 	 * @param {function} [bootOpts.bootCompleted] A list of middle-wares with koa-style which would be trigger like onions
 	 */
 	constructor(bootOpts) {
-		this.rootApp = bootOpts.rootApp || {};
-		this.modules = bootOpts.modules;
-		this.mount = bootOpts.mount || '#app';
-		this.servers = bootOpts.servers;
-		this.startCallback = isFunction(bootOpts.started)? bootOpts.started : function(vm){ };
-		this.bootCompleted = bootOpts.bootCompleted || [];
+		this.rootApp = bootOpts.rootApp || {}
+		this.modules = bootOpts.modules
+		this.mount = bootOpts.mount || '#app'
+		this.servers = bootOpts.servers
+		this.startCallback = isFunction(bootOpts.started)? bootOpts.started : function(vm){ }
+		this.bootCompleted = bootOpts.bootCompleted || []
 	}
 
 	/**
@@ -31,40 +33,40 @@ class BootStrap {
 	 * @returns {contextProto}
 	 */
 	getContext() {
-		const ctx = Object.create(contextProto);
-		ctx.bootstrap = this;
+		const ctx = Object.create(contextProto)
+		ctx.bootstrap = this
 
 		//Register ctx.servers.xxx
 		if (this.servers) {
-			ctx.servers = {};
+			ctx.servers = {}
 			for(const key in this.servers) {
 				//each server has different config
-				ctx.servers[key] = new HttpClient(this.servers[key]);
+				ctx.servers[key] = new HttpClient(this.servers[key])
 				if (key === 'default') { //register default to ctx.server
-					ctx.server = ctx.servers[key];
+					ctx.server = ctx.servers[key]
 				}
 			}
 		} else {
 			//未进行server配置的话，会默认初始化一个不进行url改写的client
-			ctx.server = new HttpClient();
+			ctx.server = new HttpClient()
 		}
-		return ctx;
+		return ctx
 	}
 
 	/**
 	 * 统一配置Vue的参数。
 	 */
 	configVue(Vue) {
-		const rootContext = this.getContext();
+		const rootContext = this.getContext()
 		Object.defineProperty(Vue.prototype, 'ctx', {
 			get () { return rootContext }
-		});
+		})
 		Vue.config.errorHandler = function (err, vm, info) {
 			// handle error
 			// `info` is a Vue-specific error info, e.g. which lifecycle hook
 			// the error was found in. Only available in 2.2.0+
 			if (vm.ctx) {
-				vm.ctx.onError(err, vm, info);
+				vm.ctx.onError(err, vm, info)
 			}
 		}
 	}
@@ -80,44 +82,44 @@ class BootStrap {
 	 * 5. started回调
 	 */
 	async startUp() {
-		const Vue = (await import(/* webpackChunkName: "vue" */'vue')).default;
-		const VueRouter = (await import(/* webpackChunkName: "vue" */'vue-router')).default;
+		const Vue = (await import(/* webpackChunkName: "vue" */'vue')).default
+		const VueRouter = (await import(/* webpackChunkName: "vue" */'vue-router')).default
 
-		Vue.use(VueRouter);
-		await this.configVue(Vue);
+		Vue.use(VueRouter)
+		await this.configVue(Vue)
 
-		let routes = [];
+		let routes = []
 
 		if (this.modules) {
-			routes = await this.loadModules(this.modules);
+			routes = await this.loadModules(this.modules)
 		}
 
 		this.router = new VueRouter({
 			routes: routes
-		});
+		})
 		this.rootApp = (await this.rootApp()).default
-		this.rootApp.router = this.router;
+		this.rootApp.router = this.router
 
 		//4. 启动Vue
-		this.app = new Vue(this.rootApp).$mount(this.mount);
+		this.app = new Vue(this.rootApp).$mount(this.mount)
 
 		//check loading?
-		await this.started();
+		await this.started()
 	}
 
 	async loadModules(modules) {
 		// 依次循环解析每个module
-		const routes = [];
+		const routes = []
 		for(const def of modules) {
-			let module = def;
+			let module = def
 			if (isFunction(def)) {
-				module = (await def()).default;
+				module = (await def()).default
 			}
 			if (module.routes) {
-				[].push.apply(routes, module.routes);
+				[].push.apply(routes, module.routes)
 			}
 		}
-		return routes;
+		return routes
 	}
 
 	/**
@@ -130,7 +132,7 @@ class BootStrap {
 		} catch (err) {
 			console.log('boot complete err:' + err)
 		}
-		await this.startCallback(this.app);
+		await this.startCallback(this.app)
 	}
 }
-export default BootStrap;
+export default BootStrap
