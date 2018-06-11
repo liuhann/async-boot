@@ -26,6 +26,7 @@ class BootStrap {
 		this.servers = bootOpts.servers
 		this.startCallback = isFunction(bootOpts.started)? bootOpts.started : function(vm){ }
 		this.bootCompleted = bootOpts.bootCompleted || []
+		this.ctx = Object.create(contextProto)
 	}
 
 	/**
@@ -82,6 +83,9 @@ class BootStrap {
 	 * 5. started回调
 	 */
 	async startUp() {
+
+
+
 		const Vue = (await import(/* webpackChunkName: "vue" */'vue')).default
 		const VueRouter = (await import(/* webpackChunkName: "vue" */'vue-router')).default
 

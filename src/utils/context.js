@@ -4,9 +4,6 @@
  * Data\service\errors could be injected into context for global control and functional programming
  */
 const contextProto = {
-
-	servers: {},
-
     throwError(...args) {
 
     },
@@ -14,7 +11,7 @@ const contextProto = {
     /**
      * @param err
      */
-    onError(err, vmapp) {
+    onError(err) {
 
     },
 }
