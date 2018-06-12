@@ -1,9 +1,12 @@
-
 /**
  * Page Context
- * Data\service\errors could be injected into context for global control and functional programming
+ * It is available since boot up
  */
 const contextProto = {
+    bootOpts: {
+
+    },
+
     throwError(...args) {
 
     },

@@ -1,13 +1,10 @@
 const _toString = Object.prototype.toString;
-
 export function isFunction(object) {
     return !!(object && object.constructor && object.call && object.apply);
 }
-
 export function isUndef (v) {
     return v === undefined || v === null
 }
-
 export function isPrimitive (value) {
     return (
         typeof value === 'string' ||
@@ -15,7 +12,6 @@ export function isPrimitive (value) {
         typeof value === 'boolean'
     )
 }
-
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 /**
