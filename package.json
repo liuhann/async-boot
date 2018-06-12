@@ -4,9 +4,7 @@
   "description": "Boot a web-app with async loading of modules and koa style middleware support",
   "main": "./src/bootstrap.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "npm:pub": "npm set registry https://registry.npmjs.org/",
-    "npm:xbn": "npm set registry http://npm.xbniao.com"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -28,7 +26,6 @@
   },
   "homepage": "https://github.com/liuhann/async-boot#readme",
   "dependencies": {
-    "axios": "^0.18.0",
     "koa-compose": "^4.0.0",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1"
