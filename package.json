@@ -2,7 +2,7 @@
   "name": "async-boot",
   "version": "1.1.0",
   "description": "Boot a web-app with async loading of modules and koa style middleware support",
-  "main": "./src/bootstrap.js",
+  "main": "./src/async-boot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -13,7 +13,7 @@ import httpServers from './module/servers'
 /**
  * @param {object} bootOpts boot options
  * @param {array} bootOpts.systemModules system module list. system module is run before module load
- * @param {array} bootOpts.modules module list
+ * @param {array} bootOpts.packages package list
  * @param {object|async function} [bootOpts.rootApp={}] root module
  * @param {string} [bootOpts.mount="app"] the html element to mount to
  * @param {object} [bootOpts.servers] http services locations
@@ -40,7 +40,7 @@ class AsyncBoot {
 	async startUp() {
 		await this.loadSystemModules()
 
-		await this.loadModules(this.modules)
+		await this.loadModules(this.ctx.bootOpts.packages)
 
 		await this.started()
 	}
@@ -59,9 +59,9 @@ class AsyncBoot {
 		await composed(this.ctx)
 	}
 
-    async loadModules(modules) {
+    async loadModules(packages) {
         // 依次循环解析每个module
-        for(const def of modules) {
+        for(const def of packages) {
             let module = def
 			// 以import形式引入的module
             if (isFunction(def)) {
