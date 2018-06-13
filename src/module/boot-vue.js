@@ -1,4 +1,6 @@
 import {isArray, isFunction} from "../utils/lang";
+import Vue from 'vue'
+import VueRouter from 'vue-router'
 
 export default {
     async onload(ctx, next) {
@@ -12,7 +14,7 @@ export default {
         await next()
     },
 
-    async onModuleLoad(module, ctx) {
+    async moduleLoaded(module, ctx) {
         if (isArray(module.routes)) {
             ctx.vueRouter.addRoutes(module.routes)
         } else if (isFunction(module.routes)) {
@@ -21,8 +23,9 @@ export default {
     },
 
     async started(ctx, next) {
-        const vueOptions = (await ctx.bootOpts.vue.rootApp).default
+        const vueOptions = ctx.bootOpts.vue.rootApp
         vueOptions.router = ctx.vueRouter
-        ctx.vueRootApp = new Vue(vueOptions).mount(ctx.bootOpts.vue.mount || '#app')
+        ctx.vueRootApp = new Vue(vueOptions)
+        ctx.vueRootApp.$mount(ctx.bootOpts.vue.mount || '#app')
     }
 }

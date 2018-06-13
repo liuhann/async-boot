@@ -17,8 +17,7 @@ import httpClient from './module/servers'
  * @param {object|async function} [bootOpts.rootApp={}] root module
  * @param {string} [bootOpts.mount="app"] the html element to mount to
  * @param {object} [bootOpts.servers] http services locations
- * @param {function} [bootOpts.started] trigger on bootstrap complete
- * @param {function} [bootOpts.bootCompleted] A list of middle-wares with koa-style which would be trigger like onions
+ * @param {function|array} [bootOpts.started] callback function or a list of middle-wares with koa-style which would be trigger like onions
  */
 class AsyncBoot {
   constructor(bootOpts) {
@@ -34,27 +33,30 @@ class AsyncBoot {
     // system callback on module loaded
     this.onModuleLoads = []
 
-    this.bootCompleted = bootOpts.bootCompleted || []
+    this.startedMiddlewares = []
   }
 
   async startUp() {
     await this.loadSystemModules()
-
     await this.loadModules(this.ctx.bootOpts.packages)
-
     await this.started()
   }
 
   async loadSystemModules() {
     const onLoads = []
     for (const module of this.systemModules) {
+      // onload\moduleLoaded\started callbacks
       if (isFunction(module.onload)) {
         onLoads.push(module.onload)
       }
-      if (isFunction(module.onModuleLoad)) {
-        this.onModuleLoads.push(module.onModuleLoad)
+      if (isFunction(module.moduleLoaded)) {
+        this.onModuleLoads.push(module.moduleLoaded)
+      }
+      if (isFunction(module.started)) {
+        this.startedMiddlewares.push(module.started)
       }
     }
+    this.startedMiddlewares = this.startedMiddlewares.concat(this.ctx.bootOpts.started||[])
     const composed = compose(onLoads)
     await composed(this.ctx)
   }
@@ -78,11 +80,11 @@ class AsyncBoot {
    * 整个app启动完成后的操作。 可以在此处设置， 默认加载的第一页
    */
   async started() {
-    const composed = compose(this.bootCompleted)
+    const composed = compose(this.startedMiddlewares)
     try {
       await composed(this.ctx)
     } catch (err) {
-      console.log('boot complete err:' + err)
+      console.error('boot err:', err)
     }
   }
 }
