@@ -18,7 +18,7 @@ export default {
       //未进行server配置的话，会默认初始化一个不进行url改写的client
       ctx.client = axios.create(Object.assign({
         withCredentials: true
-      });
+      }))
     }
   }
 }
