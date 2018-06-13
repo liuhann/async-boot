@@ -21,7 +21,8 @@ export default {
     },
 
     async started(ctx, next) {
-        const rootVue = (await ctx.bootOpts.vue.rootApp).default
-        ctx.vueRootApp = new Vue(rootVue).mount(ctx.bootOpts.vue.mount || '#app')
+        const vueOptions = (await ctx.bootOpts.vue.rootApp).default
+        vueOptions.router = ctx.vueRouter
+        ctx.vueRootApp = new Vue(vueOptions).mount(ctx.bootOpts.vue.mount || '#app')
     }
 }
