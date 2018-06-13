@@ -8,6 +8,12 @@ export default {
             const Vue = (await import(/* webpackChunkName: "vue" */'vue')).default
             const VueRouter = (await import(/* webpackChunkName: "vue" */'vue-router')).default
             Vue.use(VueRouter)
+            //ctx is read only
+            Object.defineProperty(Vue.prototype, 'ctx', {
+                get () {
+                  return ctx
+                }
+            })
             const router = new VueRouter()
             ctx.vueRouter = router
         }

@@ -4,7 +4,8 @@
   "description": "Boot a web-app with async loading of modules and koa style middleware support",
   "main": "./src/async-boot.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "npm": "npm set registry https://registry.npmjs.org/"
   },
   "repository": {
     "type": "git",
