@@ -25,7 +25,7 @@ class AsyncBoot {
     this.ctx = Object.create(contextProto)
     this.ctx.bootOpts = bootOpts
 
-    this.systemModules = [bootVue, httpClient, ...bootOpts.systemModules]
+    this.systemModules = [bootVue, httpClient, ...bootOpts.systemModules||[]]
 
     // application modules
     this.modules = []

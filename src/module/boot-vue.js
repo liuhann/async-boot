@@ -33,5 +33,6 @@ export default {
         vueOptions.router = ctx.vueRouter
         ctx.vueRootApp = new Vue(vueOptions)
         ctx.vueRootApp.$mount(ctx.bootOpts.vue.mount || '#app')
+        await next()
     }
 }
