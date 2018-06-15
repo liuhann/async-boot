@@ -1,5 +1,5 @@
-import contextProto from  './utils/context'
-import {isFunction, isPlainObject} from './utils/lang'
+import contextProto from './utils/context'
+import {isFunction} from './utils/lang'
 import compose from 'koa-compose'
 
 import bootVue from './module/boot-vue'
@@ -12,7 +12,6 @@ import httpClient from './module/servers'
  */
 /**
  * @param {object} bootOpts boot options
- * @param {array} bootOpts.systemModules system module list. system module is run before module load
  * @param {array} bootOpts.packages package list
  * @param {object|async function} [bootOpts.rootApp={}] root module
  * @param {string} [bootOpts.mount="app"] the html element to mount to
@@ -20,50 +19,58 @@ import httpClient from './module/servers'
  * @param {function|array} [bootOpts.started] callback function or a list of middle-wares with koa-style which would be trigger like onions
  */
 class AsyncBoot {
-  constructor(bootOpts) {
+  constructor (bootOpts) {
     // page context
     this.ctx = Object.create(contextProto)
     this.ctx.bootOpts = bootOpts
 
-    this.systemModules = [bootVue, httpClient, ...bootOpts.systemModules||[]]
+    this.systemModules = {
+      vue: bootVue,
+      servers: httpClient
+    }
 
-    // application modules
+    // application modules  (load on startUp)
     this.modules = []
-
-    // system callback on module loaded
-    this.onModuleLoads = []
-
-    this.startedMiddlewares = []
+    this.moduleHanlders = []
+    this.onStarted = [bootOpts.started]
   }
 
-  async startUp() {
+  async startUp () {
     await this.loadSystemModules()
     await this.loadModules(this.ctx.bootOpts.packages)
     await this.started()
   }
 
-  async loadSystemModules() {
-    const onLoads = []
-    for (const module of this.systemModules) {
-      // onload\moduleLoaded\started callbacks
-      if (isFunction(module.onload)) {
-        onLoads.push(module.onload)
-      }
-      if (isFunction(module.moduleLoaded)) {
-        this.onModuleLoads.push(module.moduleLoaded)
-      }
-      if (isFunction(module.started)) {
-        this.startedMiddlewares.push(module.started)
-      }
+  async loadSystemModules () {
+    const awaits = []
+    for (let key in this.systemModules) {
+      awaits.push(this.use(this.systemModules[key], this.ctx.bootOpts[key]))
     }
-    this.startedMiddlewares = this.startedMiddlewares.concat(this.ctx.bootOpts.started||[])
-    const composed = compose(onLoads)
-    await composed(this.ctx)
+    await Promise.all(awaits)
   }
 
-  async loadModules(packages) {
+  /**
+   * Using system modules
+   * @param system
+   * @param options
+   * @returns {Promise<[]>}
+   */
+  async use (system, options) {
+    // onload\moduleLoaded\started callbacks
+    if (isFunction(system.load)) {
+      await system.load(this.ctx)
+    }
+    if (isFunction(system.onModuleLoad)) {
+      this.moduleHanlders.push(system.onModuleLoad)
+    }
+    if (isFunction(system.started)) {
+      this.onStarted.push(system.started)
+    }
+  }
+
+  async loadModules (packages) {
     // 依次循环解析每个module
-    for(const def of packages) {
+    for (const def of packages) {
       let module = def
       // 以import形式引入的module
       if (isFunction(def)) {
@@ -71,21 +78,21 @@ class AsyncBoot {
       }
 
       if (isFunction(module.onload)) {
-        module.onload(this.ctx)
+        await module.onload(this.ctx)
       }
 
       this.modules.push(module)
-      for (const systemOnModuleLoaded of this.onModuleLoads) {
-        systemOnModuleLoaded(module, this.ctx)
+      for (const moduleHanlder of this.moduleHanlders) {
+        moduleHanlder(module, this.ctx)
       }
     }
   }
 
   /**
-   * 整个app启动完成后的操作。 可以在此处设置， 默认加载的第一页
+   * 处理系统模块的 started 事件， 这个次序遵循koa洋葱圈模型
    */
-  async started() {
-    const composed = compose(this.startedMiddlewares)
+  async started () {
+    const composed = compose(this.onStarted)
     try {
       await composed(this.ctx)
     } catch (err) {
@@ -93,4 +100,5 @@ class AsyncBoot {
     }
   }
 }
+
 export default AsyncBoot
