@@ -3,21 +3,13 @@
  * It is available since boot up
  */
 const contextProto = {
-    bootOpts: {
+	bootOpts: {},
+	throwError (...args) {
 
-    },
+	},
+	onError (err) {
 
-    throwError(...args) {
-
-    },
-
-    /**
-     * @param err
-     */
-    onError(err) {
-
-    },
+	}
 }
 
-
-export default contextProto;
+export default contextProto
