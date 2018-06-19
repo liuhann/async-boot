@@ -8,6 +8,17 @@ Boot a web-app with async loading of modules and koa style middleware support
     npm i async-boot --save
 ```
 
+## 启动流程
+
+1. 加载系统模块 (vue/axios)
+2. 系统模块解析配置，选择加载 vue-router、vuex
+3. 加载业务模块
+   1.  import() 方式引入的业务模块会等待加载完成
+   2. 调用系统模块  onModuleLoad 方法  （vue会加载业务模块中定义的路由、store）
+   3. await  onload
+4. 依次执行 options.started(ctx, next) 系统模块的started方法  以koa中间件形式
+5. 执行过程中可以动态执行3-加载业务模块
+
 ## 使用
 
 

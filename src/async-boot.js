@@ -76,15 +76,13 @@ class AsyncBoot {
       if (isFunction(def)) {
         module = (await def()).default
       }
-
-      if (isFunction(module.onload)) {
-        await module.onload(this.ctx)
-      }
-
-      this.modules.push(module)
       for (const moduleHanlder of this.moduleHanlders) {
         moduleHanlder(module, this.ctx)
       }
+      if (isFunction(module.onload)) {
+        await module.onload(this.ctx)
+      }
+      this.modules.push(module)
     }
   }
 
