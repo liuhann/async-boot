@@ -3,13 +3,12 @@
  * It is available since boot up
  */
 const contextProto = {
-	bootOpts: {},
-	throwError (...args) {
+  throwError (...args) {
 
-	},
-	onError (err) {
-
-	}
+  },
+  onError (err) {
+    console.log(err)
+  }
 }
 
 export default contextProto

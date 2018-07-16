@@ -23,6 +23,8 @@ class AsyncBoot {
     // page context
     this.ctx = Object.create(contextProto)
     this.ctx.bootOpts = bootOpts
+    this.ctx.config = bootOpts.config || {}
+    this.ctx.booter = this
 
     this.systemModules = {
       vue: bootVue,
@@ -32,7 +34,7 @@ class AsyncBoot {
     // application modules  (load on startUp)
     this.modules = []
     this.moduleHanlders = []
-    this.onStarted = [bootOpts.started]
+    this.onStarted = isFunction(bootOpts.started) ? [bootOpts.started] : bootOpts.started
   }
 
   async startUp () {
@@ -74,13 +76,13 @@ class AsyncBoot {
       let module = def
       // 以import形式引入的module
       if (isFunction(def)) {
-        module = (await def()).default
+        module = await def()
       }
       for (const moduleHanlder of this.moduleHanlders) {
         moduleHanlder(module, this.ctx)
       }
       if (isFunction(module.onload)) {
-        await module.onload(this.ctx)
+        await module.onload(this.ctx, this.ctx.config || {})
       }
       this.modules.push(module)
     }
