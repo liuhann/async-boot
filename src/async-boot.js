@@ -25,7 +25,6 @@ class AsyncBoot {
     this.ctx.bootOpts = bootOpts
     this.ctx.config = bootOpts.config || {}
     this.ctx.booter = this
-
     this.systemModules = {
       vue: bootVue,
       servers: httpClient

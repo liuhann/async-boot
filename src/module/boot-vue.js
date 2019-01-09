@@ -1,37 +1,30 @@
-import {isArray, isFunction, isEmpty} from "../utils/lang";
+import {isArray, isFunction} from '../utils/lang'
 
 export default {
 
   async load (ctx) {
     const options = {
       router: true,
-      vuex: true,
       ...ctx.bootOpts.vue
     }
 
-    if (!window.Vue) {
-      let vueImport = await import(/* webpackChunkName: "vue" */'vue')
-      window.Vue = vueImport.default || vueImport
+    const Vue = ctx.bootOpts.Vue || window.Vue
+    if (Vue == null) {
+      console.error('Vue must be imported as opts.Vue or window.Vue')
+      return
     }
     ctx.Vue = Vue
     if (options.router) {
-      if (!window.VueRouter) {
-        let VueRouter = await import(/* webpackChunkName: "vue-router" */'vue-router')
-        window.VueRouter = VueRouter.default || VueRouter
+      const VueRouter = ctx.bootOpts.VueRouter || window.VueRouter
+      if (VueRouter) {
+        Vue.use(VueRouter)
+        ctx._router = new VueRouter()
+        ctx.VueRouter = VueRouter
       }
-      Vue.use(VueRouter)
-      ctx._router = new VueRouter()
-      ctx.VueRouter = VueRouter
     }
-    if (options.vuex) {
-      let Vuex = await import(/* webpackChunkName: "vuex" */'vuex')
-      Vuex = Vuex.default || Vuex
-      Vue.use(Vuex)
-      ctx._store = new Vuex.Store(options.store || {})
-    }
-    //ctx is read only
+    // ctx is read only
     Object.defineProperty(Vue.prototype, 'ctx', {
-      get() {
+      get () {
         return ctx
       }
     })
@@ -43,7 +36,7 @@ export default {
     } else if (isFunction(module.routes)) {
       ctx._router.addRoutes(await module.routes(ctx))
     }
-    console.log (module)
+    console.log(module)
     if (module.store) { // register store module by module name
       ctx._store.registerModule(module.name, module.store)
     }
@@ -52,8 +45,7 @@ export default {
   async started (ctx, next) {
     const vueOptions = ctx.bootOpts.vue.rootApp || {}
     vueOptions.router = ctx._router
-    vueOptions.store = ctx._store
-    ctx.vueRootApp = new Vue(vueOptions)
+    ctx.vueRootApp = new ctx.Vue(vueOptions)
 
     await next()
 
