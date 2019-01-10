@@ -1,13 +1,11 @@
 import {isArray, isFunction} from '../utils/lang'
 
 export default {
-
   async load (ctx) {
     const options = {
       router: true,
       ...ctx.bootOpts.vue
     }
-
     const Vue = ctx.bootOpts.Vue || window.Vue
     if (Vue == null) {
       console.error('Vue must be imported as opts.Vue or window.Vue')
@@ -36,20 +34,15 @@ export default {
     } else if (isFunction(module.routes)) {
       ctx._router.addRoutes(await module.routes(ctx))
     }
-    console.log(module)
-    if (module.store) { // register store module by module name
-      ctx._store.registerModule(module.name, module.store)
-    }
   },
 
   async started (ctx, next) {
     const vueOptions = ctx.bootOpts.vue.rootApp || {}
     vueOptions.router = ctx._router
-    ctx.vueRootApp = new ctx.Vue(vueOptions)
+    ctx.vueInstance = new ctx.Vue(vueOptions)
 
     await next()
-
     // mount at last
-    ctx.vueRootApp.$mount(ctx.bootOpts.vue.mount || '#app')
+    ctx.vueInstance.$mount(ctx.bootOpts.vue.mount || '#app')
   }
 }

@@ -26,8 +26,7 @@ class AsyncBoot {
     this.ctx.config = bootOpts.config || {}
     this.ctx.booter = this
     this.systemModules = {
-      vue: bootVue,
-      servers: httpClient
+      vue: bootVue
     }
 
     // application modules  (load on startUp)
