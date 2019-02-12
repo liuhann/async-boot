@@ -11,27 +11,30 @@ simple boot/loader for big-scaled moduled system
 ## Basic Usage
 
 ```javascript
-import AsyncBoot from 'async-boot'
-import AppRoot from './components/root.vue'
-import config from './config/config'
 
-import package1 from './packages/dao/index'
-import package2 from './packages/home/index'
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+
+import home from './packages/home'
+
+import './common.css'
+Vue.use(VueRouter)
 
 const boot = new AsyncBoot({
-  vue: {
-    rootApp: AppRoot,
-    mount: '#app'
-  },
-  servers: config.servers,
+  Vue,
+  VueRouter,
+  App,
+  mount: '#app',
   packages: [
-      package1, package2
+    home
   ],
-  started: [(ctx, next) => {
-    ctx.vueRouter.replace('/home')
-  }]
+  started: async (ctx, next) => {
+    Object.assign(ctx.Vue.prototype, {
+      nanobus: new Nanobus()
+    })
+    await next()
+  }
 })
-boot.startUp()
 ```
 
 ### Module and Portal Module
