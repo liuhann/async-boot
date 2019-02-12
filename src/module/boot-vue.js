@@ -37,12 +37,12 @@ export default {
   },
 
   async started (ctx, next) {
-    const vueOptions = ctx.bootOpts.vue.rootApp || {}
+    const vueOptions = ctx.bootOpts.App || {}
     vueOptions.router = ctx._router
     ctx.vueInstance = new ctx.Vue(vueOptions)
 
     await next()
     // mount at last
-    ctx.vueInstance.$mount(ctx.bootOpts.vue.mount || '#app')
+    ctx.vueInstance.$mount(ctx.bootOpts.mount || '#app')
   }
 }

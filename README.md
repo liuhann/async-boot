@@ -1,20 +1,18 @@
 # async-boot
 
-boot  a  vue app with big scaled support 
+simple boot/loader for big-scaled moduled system
 
-## install 
+## install
 
 ```
     npm i async-boot --save
 ```
 
-
-
 ## Basic Usage
 
 ```javascript
 import AsyncBoot from 'async-boot'
-import AppRoot from './components/root.vue'  
+import AppRoot from './components/root.vue'
 import config from './config/config'
 
 import package1 from './packages/dao/index'
@@ -41,8 +39,8 @@ boot.startUp()
 
 
 1 routes （Array|async function）属性暴露的路由会注册到全局的vue-router
-2 onload （async function） 模块加载会执行 
-3 
+2 onload （async function） 模块加载会执行
+3
 
 
 ```javascript
@@ -66,7 +64,7 @@ export default {
 
 async-boot内置2个系统模块，分别负责vue、vue-router的启动及跨域访问的http client初始化
 
-#### ctx  
+#### ctx
 页面上下文，全局单例， 在启动期间系统模块和应用模块都可以将配置、服务等对象注入其中。 同时在vue文件中也可以通过 this.ctx获取。
 
 ### 参数
