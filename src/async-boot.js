@@ -3,7 +3,6 @@ import {isFunction} from './utils/lang'
 import compose from 'koa-compose'
 
 import bootVue from './module/boot-vue'
-import httpClient from './module/servers'
 
 /**
  * Boot class
