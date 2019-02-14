@@ -22,6 +22,7 @@ class AsyncBoot {
   constructor (bootOpts) {
     // page context
     this.ctx = Object.create(contextProto)
+    Object.assign(this.ctx, bootOpts)
     this.ctx.bootOpts = bootOpts
     this.ctx.config = bootOpts.config || {}
     this.ctx.booter = this
