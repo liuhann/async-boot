@@ -5,7 +5,7 @@ export default {
     const options = {
       router: true,
       mode: 'hash',
-      ...ctx.bootOpts.vue
+      ...ctx.bootOpts
     }
     const Vue = ctx.bootOpts.Vue || window.Vue
     if (Vue == null) {
