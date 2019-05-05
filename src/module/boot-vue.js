@@ -4,6 +4,7 @@ export default {
   async load (ctx) {
     const options = {
       router: true,
+      mode: 'hash',
       ...ctx.bootOpts.vue
     }
     const Vue = ctx.bootOpts.Vue || window.Vue
@@ -16,7 +17,9 @@ export default {
       const VueRouter = ctx.bootOpts.VueRouter || window.VueRouter
       if (VueRouter) {
         Vue.use(VueRouter)
-        ctx._router = new VueRouter()
+        ctx._router = new VueRouter({
+          mode: options.mode
+        })
         ctx.VueRouter = VueRouter
       }
     }
